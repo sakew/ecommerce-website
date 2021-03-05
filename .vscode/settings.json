@@ -1,4 +1,6 @@
 {
-    "eslint.enable": false,
-    "jshint.enable": false
+    "eslint.enable": true,
+    "jshint.enable": true,
+    "git.ignoreLimitWarning": true,
+    "compile-hero.disable-compile-files-on-did-save-code": false
 }
