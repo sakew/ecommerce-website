@@ -4,11 +4,14 @@ import data from "./data.js";
 import userRouter from "./routers/userRouter.js";
 
 const app = express();
-mongoose.connect("mongodb://localhost/ecommerce-website", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-});
+mongoose.connect(
+  process.env.MONGODB_URL || "mongodb://localhost/ecommerce-website",
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+  }
+);
 
 app.get("/api/products/:id", (req, res) => {
   const product = data.products.find((item) => item._id === req.params.id);
