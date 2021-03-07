@@ -25,3 +25,4 @@ frontend/package-lock.json
 .eslintrc.js
 .env
 .vscode
+package-lock.json
