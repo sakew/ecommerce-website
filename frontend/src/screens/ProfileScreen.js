@@ -1,21 +1,45 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { detailsUser } from "../actions/userActions";
+import { detailsUser, updateUserProfile } from "../actions/userActions";
 import LoadingBox from "../components/LoadingBox";
 import MessageBox from "../components/MessageBox";
+import { USER_UPDATE_PROFILE_RESET } from "../constants/userConstants";
 
 export default function ProfileScreen() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const userSignin = useSelector((state) => state.userSignin);
-  const dispatch = useDispatch();
+
   const { userInfo } = userSignin;
   const userDetails = useSelector((state) => state.userDetails);
   const { loading, error, user } = userDetails;
+  const userUpdateProfile = useSelector((state) => state.userUpdateProfile);
+  const {
+    success: successUpdate,
+    error: errorUpdate,
+    loading: loadingUpdate,
+  } = userUpdateProfile;
+  const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(detailsUser(userInfo._id));
-  }, [dispatch, userInfo._id]);
+    if (!user) {
+      dispatch({ type: USER_UPDATE_PROFILE_RESET });
+      dispatch(detailsUser(userInfo._id));
+    } else {
+      setName(user.name);
+      setEmail(user.email);
+    }
+  }, [dispatch, userInfo._id, user]);
   const submitHandler = (event) => {
     event.preventDefault();
     // dispatch update profile
+    if (password !== confirmPassword) {
+      alert("Password and Confirm Password Are Not Matched");
+    } else {
+      dispatch(updateUserProfile({ userId: user._id, name, email, password }));
+    }
   };
   return (
     <div>
@@ -29,13 +53,23 @@ export default function ProfileScreen() {
           <MessageBox variant="danger">{error}</MessageBox>
         ) : (
           <>
+            {loadingUpdate && <LoadingBox></LoadingBox>}
+            {errorUpdate && (
+              <MessageBox variant="danger">{errorUpdate}</MessageBox>
+            )}
+            {successUpdate && (
+              <MessageBox variant="success">
+                Profile Updated Successfully
+              </MessageBox>
+            )}
             <div>
               <label htmlFor="name">Name</label>
               <input
                 id="name"
                 type="text"
                 placeholder="Enter name"
-                value={user.name}
+                value={name}
+                onChange={(event) => setName(event.target.value)}
               ></input>
             </div>
             <div>
@@ -44,7 +78,8 @@ export default function ProfileScreen() {
                 id="email"
                 type="text"
                 placeholder="Enter email"
-                value={user.email}
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
               ></input>
             </div>
             <div>
@@ -53,7 +88,7 @@ export default function ProfileScreen() {
                 id="password"
                 type="text"
                 placeholder="Enter password"
-                value={user.password}
+                onChange={(event) => setPassword(event.target.value)}
               ></input>
             </div>
             <div>
@@ -62,7 +97,7 @@ export default function ProfileScreen() {
                 id="confirmPassword"
                 type="text"
                 placeholder="Enter Confirm Password"
-                value={user.confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
               ></input>
             </div>
             <div>
